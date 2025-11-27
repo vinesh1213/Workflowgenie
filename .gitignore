@@ -5,6 +5,7 @@
 *.env
 .env.*
 .env_backup
+!.env.example
 credentials.json
 service_account.json
 
@@ -36,7 +37,7 @@ __pycache__/
 venv/
 ENV/
 env/
-!.env.example
+
 # -----------------------------
 # VS Code / Editor artifacts
 # -----------------------------
