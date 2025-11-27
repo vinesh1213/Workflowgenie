@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkFlowGenie - AI Task Manager</title>
-    <style>
-        /* (omitted for brevity) copy retained from original */
-    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WorkFlowGenie</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <header>
+        <div>
+            <h1>🧞 WorkFlowGenie</h1>
+            <div class="subtitle">AI-powered task planning and workflow orchestration</div>
+        </div>
+    </header>
     <div class="container">
         <h1>🧞 WorkFlowGenie</h1>
         <p class="subtitle">AI-powered task planning and workflow orchestration</p>
         <div class="input-section">
-            <label for="taskInput">What would you like to do today?</label>
-            <textarea id="taskInput" placeholder="e.g., Send my internship form by tomorrow morning, read a React tutorial this weekend"></textarea>
+            <label for="user_input">What would you like to do today?</label>
+            <textarea id="user_input" placeholder="e.g., Send my internship form by tomorrow morning, read a React tutorial this weekend"></textarea>
             <div class="button-group">
-                <button class="btn-submit" id="submitBtn">Run Workflow</button>
-                <button class="btn-clear" id="clearBtn">Clear</button>
-                <button id="clearDbBtn" class="btn-danger" style="flex: 0.5;">Clear DB</button>
+                <button type="button" class="btn-submit" id="submitBtn">Run Workflow</button>
+                <button type="button" class="btn-clear" id="clearBtn">Clear</button>
+                <button type="button" id="clearDbBtn" class="btn-danger" style="flex: 0.5;">Clear DB</button>
             </div>
         </div>
         <div class="error" id="errorMsg"></div>
@@ -31,8 +35,6 @@
             <p>WorkFlowGenie API v1.0 | Multi-Agent Workflow Orchestration</p>
         </div>
     </div>
-    <script>
-        // minimal script - original functionality preserved in legacy UI
-    </script>
+    <script src="/static/app.js"></script>
 </body>
 </html>

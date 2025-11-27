@@ -1,4 +1,7 @@
 from typing import Dict, Any
+import asyncio
+import inspect
+
 from agents import task_extractor_agent, planner_agent, reminder_agent, reporter_agent
 
 
@@ -28,7 +31,19 @@ def run(workflow: Workflow, memory: Any, inputs: Dict[str, Any]):
     try:
         for step_func, step_name in workflow.steps:
             try:
-                output = step_func(inputs, memory, tools, llm)
+                # If the step function is a coroutine function, run it in an
+                # event loop so legacy synchronous callers (like Flask) can
+                # execute async agents. Also handle the case where a sync
+                # function returns an awaitable.
+                if inspect.iscoroutinefunction(step_func):
+                    output = asyncio.run(step_func(inputs, memory, tools, llm))
+                else:
+                    output = step_func(inputs, memory, tools, llm)
+
+                # If the returned value itself is awaitable, await it as well.
+                if inspect.isawaitable(output):
+                    output = asyncio.run(output)
+
                 result[step_name] = output
             except Exception as e:
                 import logging

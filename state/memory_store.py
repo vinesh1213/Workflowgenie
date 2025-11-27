@@ -39,6 +39,12 @@ class TaskMemory:
         Task = Query()
         self.table.update({"done": True}, Task.id == task_id)
 
+    def delete_task(self, task_id):
+        """Delete a task by its numeric id field."""
+        Task = Query()
+        # remove all matching entries
+        self.table.remove(Task.id == task_id)
+
     def clear_db(self):
         self.db.drop_tables()
         self.db = TinyDB(self.db_path)

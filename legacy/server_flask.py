@@ -1,12 +1,24 @@
-from flask import Flask, request, jsonify, send_from_directory
 import os
+import sys
 import logging
-from dotenv import load_dotenv
-from workflows.workflow import build_workflow, run
-from state.memory_store import TaskMemory
-from llm import LLM
-from tools.calendar_tool import CalendarTool
-from tools.reminder_tool import ReminderTool
+
+# When running this file directly (python legacy/server_flask.py), the
+# script's directory becomes sys.path[0] which prevents importing the
+# top-level packages. Ensure the repository root is on sys.path so
+# `workflows` and other top-level packages can be imported early.
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
+from flask import Flask, request, jsonify  # noqa: E402
+from dotenv import load_dotenv  # noqa: E402
+
+# Now safe to import local top-level packages
+from workflows.workflow import build_workflow, run  # noqa: E402
+from state.memory_store import TaskMemory  # noqa: E402
+from llm import LLM  # noqa: E402
+from tools.calendar_tool import CalendarTool  # noqa: E402
+from tools.reminder_tool import ReminderTool  # noqa: E402
 
 # Load .env after module-level imports so import ordering rules are preserved.
 load_dotenv()
@@ -16,7 +28,9 @@ logger = logging.getLogger(__name__)
 
 
 def create_app():
-    app = Flask("workflowgenie")
+    # Configure Flask to serve the legacy static folder at the URL path `/static`.
+    STATIC_DIR = os.path.join(REPO_ROOT, "legacy", "static")
+    app = Flask("workflowgenie", static_folder=STATIC_DIR, static_url_path="/static")
 
     logger.info("Flask server startup: initializing LLM, tools and memory")
     llm = LLM()
@@ -35,9 +49,9 @@ def create_app():
     @app.route("/", methods=["GET"])
     def root():
         try:
-            static_path = os.path.join(app.root_path, "static", "index.html")
-            if os.path.exists(static_path):
-                return send_from_directory("static", "index.html")
+            index_path = os.path.join(app.static_folder, "index.html")
+            if os.path.exists(index_path):
+                return app.send_static_file("index.html")
         except Exception:
             pass
 
@@ -114,6 +128,18 @@ def create_app():
         mem = TaskMemory()
         mem.clear_db()
         return jsonify({"status": "ok", "message": "Database cleared"})
+
+    @app.route("/tasks/<int:task_id>/delete", methods=["POST", "DELETE"])
+    def delete_task(task_id: int):
+        memory: TaskMemory = app.config.get("memory")
+        try:
+            memory.delete_task(task_id)
+            return jsonify({"ok": True, "deleted": task_id})
+        except Exception as e:
+            logger.exception("Failed to delete task %s", task_id)
+            return jsonify({"error": str(e)}), 500
+
+    # Dashboard endpoint removed — legacy dashboard static files deleted.
 
     return app
 

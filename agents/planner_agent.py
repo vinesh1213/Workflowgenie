@@ -5,6 +5,7 @@ import logging
 import re
 from utils import safe_parse_json
 import asyncio
+import inspect
 
 logger = logging.getLogger(__name__)
 
@@ -107,8 +108,12 @@ async def planner_agent(inputs: Dict[str, Any], memory, tools: Dict, llm) -> Dic
         }
 
         if tools and getattr(tools.get('calendar'), 'add_event', None):
-            ev = await tools['calendar'].add_event(title=title, start_time=start_time, duration_mins=duration_mins, notes=notes)
-            if 'id' in ev:
+            add_fn = tools['calendar'].add_event
+            if inspect.iscoroutinefunction(add_fn):
+                ev = await add_fn(title=title, start_time=start_time, duration_mins=duration_mins, notes=notes)
+            else:
+                ev = await asyncio.to_thread(add_fn, title=title, start_time=start_time, duration_mins=duration_mins, notes=notes)
+            if isinstance(ev, dict) and 'id' in ev:
                 event['id'] = ev['id']
         else:
             import uuid
