@@ -1,0 +1,68 @@
+# -----------------------------
+# ⚠ DO NOT UPLOAD SECRETS
+# -----------------------------
+.env
+*.env
+.env.*
+.env_backup
+credentials.json
+service_account.json
+
+# Prevent accidental DB uploads
+workflowgenie_adk_db.json
+workflowgenie_db.json
+*.db
+*.sqlite
+*.sqlite3
+
+# -----------------------------
+# Python build/cache files
+# -----------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.log
+
+# Bytecode cache in nested dirs
+**/__pycache__/
+**/*.pyc
+
+# -----------------------------
+# Virtual environments
+# -----------------------------
+.venv/
+venv/
+ENV/
+env/
+
+# -----------------------------
+# VS Code / Editor artifacts
+# -----------------------------
+.vscode/
+.history/
+*.code-workspace
+
+# -----------------------------
+# Tests / temp / debug artifacts
+# -----------------------------
+tests/
+test_*.py
+*.md.bak
+*.tmp
+.tmp/
+.cache/
+pytest_cache/
+
+# -----------------------------
+# Legacy UI assets (optional)
+# If you want to exclude full legacy folder, uncomment below:
+# legacy/
+# -----------------------------
+
+# -----------------------------
+# OS/system files
+# -----------------------------
+.DS_Store
+Thumbs.db
