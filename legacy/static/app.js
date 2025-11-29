@@ -101,26 +101,57 @@
     }
 
     async function runWorkflow() {
-        showError(''); clearResults(); setLoading(true);
+        showError(''); 
+        clearResults(); 
+        setLoading(true);
         try {
-            const text = (input.value || '').trim(); if (!text) { showError('Enter some instructions to run the workflow.'); return }
-            const resp = await fetch('/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
-            if (!resp.ok) { const body = await resp.json().catch(() => ({ error: 'server error' })); showError(body.error || 'Workflow run failed'); return }
-            const body = await resp.json(); renderStructured(body);
-        } catch (err) { showError('Network error: ' + (err && err.message)); }
-        finally { setLoading(false) }
+            const text = (input.value || '').trim(); 
+            if (!text) { 
+                showError('Enter some instructions to run the workflow.'); 
+                setLoading(false);
+                return;
+            }
+            const resp = await fetch('/run', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ text }) 
+            });
+            if (!resp.ok) { 
+                const body = await resp.json().catch(() => ({ error: 'server error' })); 
+                showError(body.error || 'Workflow run failed'); 
+                return;
+            }
+            const body = await resp.json(); 
+            renderStructured(body);
+        } catch (err) { 
+            showError('Network error: ' + (err && err.message)); 
+        }
+        finally { 
+            setLoading(false);
+        }
     }
 
-    if (submitBtn) submitBtn.addEventListener('click', runWorkflow);
-    if (clearBtn) clearBtn.addEventListener('click', (e) => {
-        // Requirement: Clear should ONLY clear the user input field.
-        e.stopPropagation();
-        // Use explicit DOM access per requirement
-        try { document.getElementById('user_input').value = ''; } catch (err) { /* noop */ }
-    });
+    if (submitBtn) {
+        submitBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            runWorkflow();
+        });
+    }
+    
+    if (clearBtn) {
+        clearBtn.addEventListener('click', (e) => {
+            // Requirement: Clear should ONLY clear the user input field.
+            e.preventDefault();
+            e.stopPropagation();
+            // Use explicit DOM access per requirement
+            try { document.getElementById('user_input').value = ''; } catch (err) { /* noop */ }
+        });
+    }
 
     if (clearDbBtn) {
         clearDbBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
             e.stopPropagation();
             if (!confirm('Clear the local DB? This will remove stored tasks.')) return;
             setLoading(true);
